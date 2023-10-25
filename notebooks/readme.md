@@ -1,0 +1,3 @@
+## 2021USAAveragePricesbyMonth.ipynb
+
+This is a tiny experiment of combining weather data ([Weather for Energy Tracker – Data Tools - IEA](https://www.iea.org/data-and-statistics/data-tools/weather-for-energy-tracker)) and average prices in the US along with electricity capacity and generation data found in [Total Energy Monthly Data - U.S. Energy Information Administration (EIA)](https://www.eia.gov/totalenergy/data/monthly/index.php). I chose the year 2021 to see the relation of weather, generation, and capacity to the average electricity prices in a tiny timescale. Extending this timescale and including more countries or regions may be nice. 
