@@ -125,7 +125,7 @@ class MainData:
         df['month']         = df['time'].dt.month
         df['month']         = df['month'].astype('int')
         df['day_of_week']   = df['time'].dt.dayofweek + 1
-        df['holiday']       = df['date'].isin(self._holidays).astype('int')
+        df['holiday']       = [(v in self._holidays) for v in df.date]
         df['business_hour'] = (df['weekday'].astype(bool)) & (df['hour'].between(8, 17))
         for col in ['hour', 'weekday', 'business_hour', 'holiday']:
             df[col].astype(np.int64)
