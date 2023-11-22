@@ -13,12 +13,13 @@ class WindowGenerator():
     """
     def __init__(self, input_width:int, label_width:int, shift:int,
                  train_df: None, val_df: None, test_df: None, 
-                 label_columns: List[str]) -> None:
+                 label_columns: List[str], batch_size=32) -> None:
 
         ## store raw data:
         self.train_df = train_df
         self.val_df = val_df
         self.test_df = test_df
+        self.batch_size_ = batch_size
 
         ## label column indices. label is the target for prediction/regression
         self.label_columns = label_columns
@@ -63,18 +64,20 @@ class WindowGenerator():
 
         return inputs, labels
     
-    def plot(self, model=None, plot_col='DA_price', max_subplots=3, title=''):
+    def plot(self, model=None, colors=None, plot_col='DA_price', max_subplots=3, title=''):
         inputs, labels = self.example
-        plt.figure(figsize=(12, 8))
+        #plt.figure()
         plot_col_index = self.column_indices[plot_col]
         max_n = min(max_subplots, len(inputs))
+        fig, axes = plt.subplots(nrows=max_n, ncols=1, figsize=(12, 8))
         if title:
-            plt.title(title)
+            axes[0].set_title(title)
         for n in range(max_n):
-            plt.subplot(max_n, 1, n+1)
-            plt.ylabel(f'{plot_col} [normed]')
-            plt.plot(self.input_indices, inputs[n, :, plot_col_index],
-                     label='Inputs', marker='.', zorder=-10)
+            ax = axes[n]
+            #plt.subplot(max_n, 1, n+1)
+            ax.set_ylabel('Day-ahead price [normed]')
+            ax.plot(self.input_indices, inputs[n, :, plot_col_index],
+                     label='Inputs', marker='.', zorder=-10, color=colors[0])
 
             if self.label_columns:
                 label_col_index = self.label_columns_indices.get(plot_col, None)
@@ -84,21 +87,20 @@ class WindowGenerator():
             if label_col_index is None:
                 continue
         
-            plt.scatter(self.label_indices, labels[n, :, label_col_index],
-                      edgecolors='k', label='Labels', c='#2ca02c', s=64)
+            ax.scatter(self.label_indices, labels[n, :, label_col_index],
+                      edgecolors='k', label='Labels', c=colors[1], s=64)
             if model is not None:
                 predictions = model(inputs)
-            plt.scatter(self.label_indices, predictions[n, :, label_col_index],
+
+            ax.scatter(self.label_indices, predictions[n, :, label_col_index],
                         marker='X', edgecolors='k', label='Predictions',
-                        c='#ff7f0e', s=64)
+                        c=colors[2], s=64)
 
             if n == 0:
-                plt.legend()
+                ax.legend()
+        return fig
 
-        #plt.show()
-
-
-    def make_dataset(self, data, batch_size=32):
+    def make_dataset(self, data):
         data = np.array(data, dtype=np.float32)
         ds = tf.keras.utils.timeseries_dataset_from_array(
             data=data,
@@ -106,7 +108,7 @@ class WindowGenerator():
             sequence_length=self.total_window_size,
             sequence_stride=1,
             shuffle=True,
-            batch_size=batch_size,)
+            batch_size=self.batch_size_,)
         
         ds = ds.map(self.split_window)
         return ds
