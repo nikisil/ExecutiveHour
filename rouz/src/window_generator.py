@@ -1,6 +1,6 @@
 import tensorflow as tf
-from typing import TypeVar, List
 import numpy as np
+from typing import List
 import matplotlib.pyplot as plt
 
 class WindowGenerator():
@@ -75,7 +75,7 @@ class WindowGenerator():
         for n in range(max_n):
             ax = axes[n]
             #plt.subplot(max_n, 1, n+1)
-            ax.set_ylabel('Day-ahead price [normed]')
+            ax.set_ylabel('DA price [normed]')
             ax.plot(self.input_indices, inputs[n, :, plot_col_index],
                      label='Inputs', marker='.', zorder=-10, color=colors[0])
 
@@ -98,6 +98,7 @@ class WindowGenerator():
 
             if n == 0:
                 ax.legend()
+            #ax.set_ylim(bottom=-2.5, top=2.5)
         return fig
 
     def make_dataset(self, data):

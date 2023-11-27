@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
+from sklearn.preprocessing import FunctionTransformer
 
 class NRGData:
     def __init__(self, location:str = "../data/dat_set_3/") -> None:
@@ -32,7 +33,6 @@ class NRGData:
     def data(self):
         return self._data
 
-
 class WeatherData:
 
     def __init__(self, loc:str = "../data/dat_set_3/") -> None:
@@ -52,7 +52,6 @@ class WeatherData:
     def merge(self, other, **kwargs):
         tmp = self._data.merge(other, **kwargs)
         return tmp
-
 
 class MainData:
     def __init__(self, read_from_file=False, 
@@ -121,6 +120,7 @@ class MainData:
         df = self._data
         df['date']          = df['time'].dt.date
         df['hour']          = df['time'].dt.strftime("%H").astype('int')
+        df['day']           = df['time'].dt.day
         df['weekday']       = df['time'].dt.dayofweek <= 4
         df['month']         = df['time'].dt.month
         df['month']         = df['month'].astype('int')
@@ -246,3 +246,94 @@ class MainData:
             indx += period
             yesterday = today
         self._data = df
+
+
+def print_correlations_to_files(df, loc="./", min_cutoff=0.1):
+
+    for corr in ['pearson', 'kendall', 'spearman']:
+        correlations = df.corrwith(df['DA_price'], method=corr, numeric_only=True, axis=0)
+        largest_corrs = correlations[abs(correlations)>min_cutoff].sort_values(ascending=False)
+        largest_corrs.name = f'{corr}_correlation'
+        largest_corrs.index.name = 'features'
+        fname = loc+f"{corr}_training_set.csv"
+        largest_corrs.to_csv(fname, float_format="%0.5f")
+
+
+def sin_transformer(period):
+    return FunctionTransformer(lambda x: np.sin(x / period * 2 * np.pi))
+
+def cos_transformer(period):
+    return FunctionTransformer(lambda x: np.cos(x / period * 2 * np.pi))
+
+def read_data_Rouz(ratio_train, ratio_val):
+    """
+        read my own data, add new temporal features.
+    """
+    df = pd.read_csv("../processed_data/data_set_final_with_average_RT_price.csv")
+    df['time'] = pd.to_datetime(df["time"])
+    df['date'] = pd.to_datetime(df["date"]).dt.date
+    df.drop(['RT_price'], inplace=True, axis=1)
+
+    df.loc[:,"hour_sin"] = sin_transformer(24).fit_transform(df["hour"])
+    df.loc[:,"hour_cos"] = cos_transformer(24).fit_transform(df["hour"])
+    df.loc[:,"day_sin"]  = sin_transformer(30.44).fit_transform(df["day"])
+    df.loc[:,"day_cos"]  = cos_transformer(20.44).fit_transform(df["day"])
+    df.loc[:,"day_of_week_sin"]  = sin_transformer(7).fit_transform(df["day_of_week"])
+    df.loc[:,"day_of_week_cos"]  = cos_transformer(7).fit_transform(df["day_of_week"])
+    df.loc[:,"month_sin"]  = sin_transformer(12).fit_transform(df["month"])
+    df.loc[:,"month_cos"]  = cos_transformer(12).fit_transform(df["month"])
+
+    features_to_drop = ['hour', 'day_of_week', 'day', 'season',
+                        'month']
+    #for col in df.columns.values:
+    #    for i in [1,2,19,20,21,22,23]:
+    #        if f'(h-{i})' in col:
+    #            for tag in ['price', 'load']:
+    #                features_to_drop.append(f'{tag}(h-{i})')
+
+    data = df.drop(features_to_drop,axis=1)
+    n = len(data)
+    indx_trn = int(n*ratio_train)
+    indx_val = indx_trn + int(n*ratio_val)
+    train_df = data[0 : indx_trn-1]
+    val_df   = data[indx_trn : indx_val-1]
+    test_df  = data[indx_val : ]
+
+    #print_correlations_to_files(train_df, loc='./', min_cutoff=0.1)
+
+    return train_df, val_df, test_df
+
+def read_data_Nic(holiday_calendar):
+    val_df = pd.read_csv("../../final_datasets/ordered_seasonal_validation_set.csv")
+    test_df = pd.read_csv("../../final_datasets/ordered_test_set.csv")
+    train_df = pd.read_csv("../../final_datasets/ordered_train_set.csv")
+
+    for df in [val_df, test_df, train_df]:
+        time_ = pd.to_datetime(df['time'])
+        day = time_.dt.day
+        df.loc[:,"hour_sin"] = sin_transformer(24).fit_transform(df["hour"])
+        df.loc[:,"hour_cos"] = cos_transformer(24).fit_transform(df["hour"])
+        df.loc[:,"day_sin"]  = sin_transformer(30.44).fit_transform(day)
+        df.loc[:,"day_cos"]  = cos_transformer(20.44).fit_transform(day)
+        df.loc[:,"day_of_week_sin"]  = sin_transformer(7).fit_transform(df["day_of_week"])
+        df.loc[:,"day_of_week_cos"]  = cos_transformer(7).fit_transform(df["day_of_week"])
+        df.loc[:,"month_sin"]  = sin_transformer(12).fit_transform(df["month"])
+        df.loc[:,"month_cos"]  = cos_transformer(12).fit_transform(df["month"])
+
+        df.loc[:,"holiday"] = [int(v in holiday_calendar) for v in df.date]
+
+        features_to_drop = ['minute','hour', 'day_of_week', 'season', 
+                            'Unnamed: 0.2', 'Unnamed: 0.1', 'Unnamed: 0',
+                            'month']
+        #for col in df.columns.values:
+        #    if 'RT_price(' in col:
+        #        features_to_drop.append(col)
+        #    for i in range(2,8):
+        #        price = f'DA_price(t-{i}D)'
+        #        load = f'load(t-{i}D)'
+        #        if col in [price, load]:
+        #            features_to_drop.append(col)
+
+        df.drop(features_to_drop, axis=1, inplace=True)
+
+    return train_df, val_df, test_df
