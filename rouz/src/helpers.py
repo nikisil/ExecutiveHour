@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
+
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
 from sklearn.preprocessing import FunctionTransformer
+
 
 class NRGData:
     def __init__(self, location:str = "../data/dat_set_3/") -> None:
