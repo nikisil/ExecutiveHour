@@ -15,6 +15,6 @@ Since the DA prices up to 24 hours prior have high correlations with the current
 RMSE of the model on the validation set is: 7.198 and 
 RMSE of the model on the test set is: 7.213
 
-Results show that the Arima model does a decent job forecasting DA prices compared to the baseline model where the prediction for the current DA price is the DA_price (t-1D). 
+Results show that the Arima model does a decent job forecasting DA prices compared to the baseline model where the prediction for the current DA price is the DA_price (t-1D). The downside of the Arima model on the other hand is that depending on the maximum iteration number, the training may take a long time.
 
 In this folder, one can find a sample Jupyter notebook demonstrating how to use the ArimaModel() class with a trivial example and another Jupyter notebook that has the code of the same model with annotations. 
