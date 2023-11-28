@@ -8,12 +8,12 @@ The model uses the training, validation, and test sets that Nic has prepared usi
 
 The model with the following hyperparameters has been trained with the training data: 
 
-$\mathrm{ARIMA} = \mathrm{SARIMAX}(\mathrm{endog}=\mathrm{train_data}[\mathrm{'DA_price'}],\mathrm{exog}=\mathrm{train_data}[f_{1}], \mathrm{order}=\left(24, 1, 7\right)).\mathrm{fit}(\mathrm{maxiter}=200)$  
- where $f_{1}$ is the Python list of the features listed above. These features were fed into the model as additional features that have an effect on the hourly DA prices. 
-Since the DA prices up to 24 hours prior have high correlations with the current day DA prices, I chose the autoregressive model of order 24 to regress my model onto the observations of the previous 24 hours. Due to the nonstationary and noisy nature of the data, 1-time differencing and a relatively big parameter for the moving-average part of Arima were needed. For these reasons, the order in the Arima model was chosen as $(24, 1, 7)$. 
+`ARIMA = SARIMAX(endog=train_data['DA_price'], exog=train_data[f1], order=(24, 1, 7)).fit(maxiter=200)`
+ where `f1` is the Python list of the features listed above. These features were fed into the model as additional features that have an effect on the hourly DA prices. 
+Since the DA prices up to 24 hours prior have high correlations with the current day DA prices, I chose the autoregressive model of order 24 to regress my model onto the observations of the previous 24 hours. Due to the nonstationary and noisy nature of the data, 1-time differencing and a relatively big parameter for the moving-average part of Arima were needed. For these reasons, the order in the Arima model was chosen as `(24, 1, 7)`. 
 
 RMSE of the model on the validation and test sets is: 7.198 and 7.213, respectively. 
 
-Results show that the Arima model does a decent job forecasting DA prices compared to the baseline model where the prediction for the current DA price is the DA_price (t-1D). The downside of the Arima model on the other hand is that depending on the maximum iteration number, the training may take a long time.
+Results show that the Arima model does a decent job forecasting DA prices compared to the baseline model where the prediction for the current DA price is the `DA_price (t-1D)`. The downside of the Arima model on the other hand is that depending on the maximum iteration number, the training may take a long time.
 
 In this folder, one can find a sample Jupyter notebook demonstrating how to use the ArimaModel() class with a trivial example and another Jupyter notebook that has the code of the same model with annotations. 
