@@ -9,7 +9,7 @@ DA_price(t-5D), where DA_price(t-kD) is the Day-ahead price of k-days ago.
 The model with the following hyperparameters has been trained with the training data: 
 
 arima_model = SARIMAX(endog=train_data['DA_price'],exog=train_data[f1], order=(24, 1, 7)).fit(maxiter=200),
-where f1 is the Python list of features listed above. These features are fed into the model as additional features that have an effect on the hourly DA prices. 
+where f1 is the Python list of the features listed above. These features are fed into the model as additional features that have an effect on the hourly DA prices. 
 Since the DA prices up to 24 hours have high correlations with the current day DA prices, I chose the autoregressive model of order 24 to regress my model onto the observations of the previous 24 hours. Due to the nonstationary and noisy nature of the data, 1-time differencing and a relatively big parameter for the moving-average part of Arima were needed. For these reasons, the order in the Arima model was chosen as (24, 1, 7). 
 
 RMSE of the model on the validation set is: 7.198 and 
