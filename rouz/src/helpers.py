@@ -267,7 +267,7 @@ def sin_transformer(period):
 def cos_transformer(period):
     return FunctionTransformer(lambda x: np.cos(x / period * 2 * np.pi))
 
-def read_data_Rouz(ratio_train, ratio_val):
+def read_data_Rouz(ratio_train, ratio_val, print_correlations=False):
     """
         read my own data, add new temporal features.
     """
@@ -287,11 +287,6 @@ def read_data_Rouz(ratio_train, ratio_val):
 
     features_to_drop = ['hour', 'day_of_week', 'day', 'season',
                         'month']
-    #for col in df.columns.values:
-    #    for i in [1,2,19,20,21,22,23]:
-    #        if f'(h-{i})' in col:
-    #            for tag in ['price', 'load']:
-    #                features_to_drop.append(f'{tag}(h-{i})')
 
     data = df.drop(features_to_drop,axis=1)
     n = len(data)
@@ -301,7 +296,8 @@ def read_data_Rouz(ratio_train, ratio_val):
     val_df   = data[indx_trn : indx_val-1]
     test_df  = data[indx_val : ]
 
-    #print_correlations_to_files(train_df, loc='./', min_cutoff=0.1)
+    if print_correlations:
+        print_correlations_to_files(train_df, loc='./', min_cutoff=0.1)
 
     return train_df, val_df, test_df
 
@@ -327,14 +323,6 @@ def read_data_Nic(holiday_calendar):
         features_to_drop = ['minute','hour', 'day_of_week', 'season', 
                             'Unnamed: 0.2', 'Unnamed: 0.1', 'Unnamed: 0',
                             'month']
-        #for col in df.columns.values:
-        #    if 'RT_price(' in col:
-        #        features_to_drop.append(col)
-        #    for i in range(2,8):
-        #        price = f'DA_price(t-{i}D)'
-        #        load = f'load(t-{i}D)'
-        #        if col in [price, load]:
-        #            features_to_drop.append(col)
 
         df.drop(features_to_drop, axis=1, inplace=True)
 
