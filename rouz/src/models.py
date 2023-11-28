@@ -159,9 +159,7 @@ class ResidualNetwork(keras.Model):
         super().__init__()
         self.model = keras.Sequential(
             [
-                keras.layers.Dense(units=256, activation="relu"),
-                keras.layers.Dense(units=128, activation="relu"),
-                keras.layers.LSTM(64, return_sequences=True),
+                keras.layers.GRU(256, return_sequences=True),
                 keras.layers.Dense(
                     nfeatures,
                     kernel_initializer=tf.initializers.zeros(),
@@ -171,8 +169,4 @@ class ResidualNetwork(keras.Model):
 
     def call(self, inputs, *args, **kwargs):
         delta = self.model(inputs, *args, **kwargs)
-
-        # The prediction for each time step is the input
-        # from the previous time step plus the delta
-        # calculated by the model.
         return inputs + delta

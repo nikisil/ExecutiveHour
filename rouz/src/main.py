@@ -57,7 +57,7 @@ def get_rmse(y_pred, y_true, is_residual=False, index=0):
     return err, num
 
 
-def main(holidays=None, multistep=False):
+def main(holidays=None, multistep=False, data_provider='rouz'):
     input_color, label_color, prediction_color = (
         colors["tab:blue"],
         colors["tab:orange"],
@@ -68,12 +68,13 @@ def main(holidays=None, multistep=False):
         colors["tab:green"],
         colors["tab:red"],
     )
-
-    # train_df, test_df, val_df = helpers.read_data_Nic(holiday_calendar=holidays)
-    # train_df['time'] = pd.to_datetime(train_df['time'])
-    # train_df = train_df[train_df.time > datetime(2020,11, 3, 23, 0, 0)]
-
-    train_df, test_df, val_df = helpers.read_data_Rouz(0.7, 0.2)
+    data_provider = data_provider.lower()
+    if data_provider == 'nic':
+        train_df, test_df, val_df = helpers.read_data_Nic(holiday_calendar=holidays)
+        train_df['time'] = pd.to_datetime(train_df['time'])
+        train_df = train_df[train_df.time > datetime(2020,11, 3, 23, 0, 0)]
+    else:
+        train_df, test_df, val_df = helpers.read_data_Rouz(0.75, 0.15)
 
     ## feature scaling:
     train_time_ = train_df.pop("time")
@@ -178,10 +179,10 @@ def main(holidays=None, multistep=False):
     model_names["Dense and LSTM"] = models.RecurrentModel(
         layer="LSTM", units=8, add_dense=True
     )
-    model_names["Residual LSTM"] = models.ResidualNetwork(nfeatures=len(column_indices))
+    model_names["Residual GRU"] = models.ResidualNetwork(nfeatures=len(column_indices))
     histories, val_perf, perf = {}, {}, {}
 
-    plt_save_loc = pathlib.Path(f"../plots/dat_set_rouz/{output_type}_step_plots/")
+    plt_save_loc = pathlib.Path(f"../plots/dat_set_{data_provider}/{output_type}_step_plots/")
     plt_save_loc.mkdir(parents=True, exist_ok=True)
 
     wide_validation_ds = wide_window.val
@@ -246,7 +247,7 @@ def main(holidays=None, multistep=False):
         test_dataset = conv_test_ds if is_conv_model else wide_validation_ds
         tmp = model_name.replace(" ", "_")
         model_save_loc = pathlib.Path(
-            f"../models/dat_set_rouz/{output_type}_step/{tmp}/"
+            f"../models/dat_set_{data_provider}/{output_type}_step/{tmp}/"
         )
         model_save_loc.mkdir(parents=True, exist_ok=True)
         model_fname = model_save_loc / f"{tmp}.keras"
@@ -338,7 +339,7 @@ def main(holidays=None, multistep=False):
     for key, val in perf.items():
         print(key, val)
 
-    hist_save_loc = pathlib.Path(f"../histories/dat_set_rouz/{output_type}_step_plots/")
+    hist_save_loc = pathlib.Path(f"../histories/dat_set_{data_provider}/{output_type}_step_plots/")
     hist_save_loc.mkdir(parents=True, exist_ok=True)
 
     for model, hist in histories.items():
@@ -383,4 +384,5 @@ if __name__ == "__main__":
     tf.config.set_visible_devices([], "GPU")
     holidays = country_holidays("US", years=np.arange(2019, 2024, 1))
     multistep = int(sys.argv[1])
-    main(holidays, multistep=multistep)
+    data_provider = sys.argv[2]
+    main(holidays, multistep=multistep, data_provider=data_provider)

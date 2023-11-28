@@ -306,9 +306,9 @@ def read_data_Rouz(ratio_train, ratio_val):
     return train_df, val_df, test_df
 
 def read_data_Nic(holiday_calendar):
-    val_df = pd.read_csv("../../final_datasets/ordered_seasonal_validation_set.csv")
-    test_df = pd.read_csv("../../final_datasets/ordered_test_set.csv")
-    train_df = pd.read_csv("../../final_datasets/ordered_train_set.csv")
+    val_df = pd.read_csv("../../final_datasets/smaller_ordered_seasonal_validation_set.csv")
+    test_df = pd.read_csv("../../final_datasets/smaller_ordered_test_set.csv")
+    train_df = pd.read_csv("../../final_datasets/larger_ordered_train_set.csv")
 
     for df in [val_df, test_df, train_df]:
         time_ = pd.to_datetime(df['time'])
