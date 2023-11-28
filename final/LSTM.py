@@ -98,7 +98,9 @@ def TrainLSTM(train_data, test_data, validate_data, features, layers=[20], save=
     model.add(Dense(1))
     model.compile(loss='mae',optimizer='adam')
 
-    history = model.fit(train_X,train_Y, epochs=num_epochs, batch_size=b_size, validation_data=(test_X,test_Y), verbose=2, shuffle=False)
+    history = model.fit(train_X,train_Y, epochs=num_epochs, 
+                        batch_size=b_size, validation_data=(test_X,test_Y), 
+                        verbose=0, shuffle=False)
 
     # Output final test set RMSE
 
@@ -114,8 +116,8 @@ def TrainLSTM(train_data, test_data, validate_data, features, layers=[20], save=
     inv_y = mms.inverse_transform(inv_y)
     inv_y = inv_y[:,0]
 
-    rmse = np.sqrt(mean_squared_error(inv_y, inv_yhat))
-    print('Test RMSE: %.3f' % rmse)
+    test_rmse = np.sqrt(mean_squared_error(inv_y, inv_yhat))
+    print('Test RMSE: %.3f' % test_rmse)
 
     # Look at validation dataset and calculate RMSE
 
@@ -135,8 +137,8 @@ def TrainLSTM(train_data, test_data, validate_data, features, layers=[20], save=
     inv_y = mms.inverse_transform(inv_y)
     inv_y = inv_y[:,0]
 
-    rmse = np.sqrt(mean_squared_error(inv_y, inv_yhat))
-    print('Validation RMSE: %.3f' % rmse)
+    validation_rmse = np.sqrt(mean_squared_error(inv_y, inv_yhat))
+    print('Validation RMSE: %.3f' % validation_rmse)
 
     if save:
 
@@ -151,18 +153,22 @@ def TrainLSTM(train_data, test_data, validate_data, features, layers=[20], save=
         
         model.save('%s.keras' % name)
     
-    return model
+    return model, history, test_rmse, validation_rmse 
 
 
-def main():
+def main(loc='./'):
 
-    ordered_train = pd.read_csv('ordered_train_set.csv',parse_dates=['time','date']).dropna()
-    test_dataset = pd.read_csv('ordered_test_set.csv',parse_dates=['time','date']).dropna()
-    val_dataset = pd.read_csv('ordered_seasonal_validation_set.csv',parse_dates=['time','date']).dropna()
-    features = ['DA_price','hour','day_of_week','holiday','business_hour','temp','dwpt','avg_load(h-24)','avg_DA_price(h-24)','RT_price(t-1D)','DA_price(t-1D)', 'load(t-1D)','RT_price(t-2D)', 'DA_price(t-2D)','load(t-2D)','RT_price(t-7D)', 'DA_price(t-7D)', 'load(t-7D)','nat_gas_spot_price', 'monthly_avg_NY_natgas_price']
+    ordered_train = pd.read_csv(loc+'ordered_train_set.csv',parse_dates=['time','date']).dropna()
+    test_dataset  = pd.read_csv(loc+'ordered_test_set.csv',parse_dates=['time','date']).dropna()
+    val_dataset   = pd.read_csv(loc+'ordered_seasonal_validation_set.csv',parse_dates=['time','date']).dropna()
+    features = ['DA_price','hour','day_of_week','holiday','business_hour','temp',
+                'dwpt','avg_load(h-24)','avg_DA_price(h-24)','RT_price(t-1D)',
+                'DA_price(t-1D)', 'load(t-1D)','RT_price(t-2D)', 'DA_price(t-2D)',
+                'load(t-2D)','RT_price(t-7D)', 'DA_price(t-7D)', 'load(t-7D)',
+                'nat_gas_spot_price', 'monthly_avg_NY_natgas_price']
                     
     test = TrainLSTM(ordered_train,val_dataset,test_dataset,features,layers=[40,20,10],save=False)
-
+    return test
 
 if __name__ == '__main__':
     main()

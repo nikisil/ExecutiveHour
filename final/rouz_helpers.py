@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from sklearn.preprocessing import FunctionTransformer
-
+from holidays.utils import country_holidays
 
 class WindowGenerator():
     """
@@ -75,7 +75,7 @@ class WindowGenerator():
         inputs, labels = self.example
         plot_col_index = self.column_indices[plot_col]
         max_n = min(max_subplots, len(inputs))
-        fig, axes = plt.subplots(nrows=max_n, ncols=1, figsize=(12, 8))
+        fig, axes = plt.subplots(nrows=max_n, ncols=1, figsize=(9, 7))
         if title:
             axes[0].set_title(title)
         for n in range(max_n):
@@ -149,7 +149,6 @@ def print_correlations_to_files(df, loc="./", min_cutoff=0.1):
         fname = loc+f"{corr}_training_set.csv"
         largest_corrs.to_csv(fname, float_format="%0.5f")
 
-
 def sin_transformer(period):
     return FunctionTransformer(lambda x: np.sin(x / period * 2 * np.pi))
 
@@ -189,7 +188,9 @@ def read_data_Rouz(ratio_train, ratio_val, print_correlations=False):
 
     return train_df, val_df, test_df
 
-def read_data_Nic(holiday_calendar):
+def read_data_Nic():
+    holiday_calendar = country_holidays("US", years=np.arange(2019, 2024, 1))
+
     val_df = pd.read_csv("../final_datasets/smaller_ordered_seasonal_validation_set.csv")
     test_df = pd.read_csv("../final_datasets/smaller_ordered_test_set.csv")
     train_df = pd.read_csv("../final_datasets/larger_ordered_train_set.csv")
@@ -210,7 +211,7 @@ def read_data_Nic(holiday_calendar):
 
         features_to_drop = ['minute','hour', 'day_of_week', 'season', 
                             'Unnamed: 0.2', 'Unnamed: 0.1', 'Unnamed: 0',
-                            'month']
+                            'month', 'date']
 
         df.drop(features_to_drop, axis=1, inplace=True)
 

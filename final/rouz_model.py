@@ -76,13 +76,18 @@ class ResidualNetwork(keras.Model):
 
 def compile_and_fit(model, window, patience=2, 
                     max_epochs=20, learning_rate=1e-2, 
+                    save_model=False,
                     fname="./tmp.keras"):
+    
     early_stopping = keras.callbacks.EarlyStopping(
         monitor="val_loss", patience=patience, mode="min"
     )
-    save_best = keras.callbacks.ModelCheckpoint(
-        fname, save_best_only=True, monitor="val_loss", mode="min"
-    )
+    cbacks = [early_stopping]
+    if save_model:
+        save_best = keras.callbacks.ModelCheckpoint(
+            fname, save_best_only=True, monitor="val_loss", mode="min"
+        )
+        cbacks.append(save_best)
 
     model.compile(
         loss=tf.keras.losses.MeanSquaredError(),
@@ -90,11 +95,12 @@ def compile_and_fit(model, window, patience=2,
         metrics=[tf.keras.metrics.RootMeanSquaredError()],
     )
 
-    history = history = model.fit(
+    history = model.fit(
         window.train,
         epochs=max_epochs,
         validation_data=window.val,
-        callbacks=[early_stopping, save_best],
+        callbacks=cbacks,
+        verbose=0
     )
     return history
 
