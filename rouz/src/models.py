@@ -36,7 +36,7 @@ def compile_and_fit(
     return history
 
 
-class Baseline(tf.keras.Model):
+class Baseline(keras.Model):
     """
     The baseline model is one of _no change_.
     It predicts the day ahead price of tomorrow (evaluated today)
