@@ -32,6 +32,34 @@ def get_prev_val(data,col,date,interval,interval_type):
         
     return val
 
+def get_future_val(data,col,date,interval,interval_type):
+
+    future_date = np.datetime64(date) + np.timedelta64(interval,interval_type)
+    val = data.loc[data['time'] == future_date][col].values
+    if val.size != 1:
+        valp1 = np.array([])
+        valm1 = np.array([])
+        h = 1
+        while valp1.size != 1 and h < 24:
+            prev_datep1 = future_date + np.timedelta64(h,'h')
+            valp1 = data.loc[data['time'] == prev_datep1][col].values
+            h += 1
+        if valp1.size == 0:
+            return np.array([0.0])
+        h = 1
+        while valm1.size != 1 and h < 24:
+            prev_datem1 = future_date - np.timedelta64(h,'h')
+            valm1 = data.loc[data['time'] == prev_datem1][col].values
+            h += 1
+        if valm1.size == 0:
+            return np.array([0.0])
+        val = (valp1 + valm1)/2
+    
+    if val.size != 1:
+        val = np.array([0.0])
+        
+    return val
+
 def get_prev_day_cols(data,days=[1,2,3,4,5,6,7],cols=['DA_price','RT_price','load']):
 
     for index,row in data.iterrows():
@@ -41,6 +69,14 @@ def get_prev_day_cols(data,days=[1,2,3,4,5,6,7],cols=['DA_price','RT_price','loa
 
     return data
 
+def get_future_h_cols(data,hours=[1,2,3,4,5,6,7],cols=['DA_price','RT_price','load']):
+
+    for index,row in data.iterrows():
+        for hour in hours:
+            for col in cols:
+                data.at[index, "%s(t+%sh)"%(col,str(hour))] = get_future_val(data,col,row.time,hour,'h')
+
+    return data
 
 class NRGData:
     def __init__(self, location:str = "../data/dat_set_3/") -> None:
