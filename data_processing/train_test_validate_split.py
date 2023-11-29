@@ -41,4 +41,5 @@ def split_train_test_val_bydate(start_date, end_date, dataset, date_parsing=[], 
     seasonal_val.to_csv('%sordered_seasonal_validation_set.csv'%target_folder)
     dropped_dataset.to_csv('%sordered_test_set.csv'%target_folder)
     dataset_ordered.to_csv('%sordered_train_set.csv'%target_folder)
+    test_val_ordered.to_csv('%sfull_ordered_test_set.csv'%target_folder)
 
