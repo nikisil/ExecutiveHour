@@ -69,6 +69,15 @@ def get_prev_day_cols(data,days=[1,2,3,4,5,6,7],cols=['DA_price','RT_price','loa
 
     return data
 
+def get_prev_hour_cols(data,hours=[1,2,3,4,5,6,7],cols=['DA_price','RT_price','load']):
+
+    for index,row in data.iterrows():
+        for hour in hours:
+            for col in cols:
+                data.at[index, "%s(t-%sh)"%(col,str(hour))] = get_prev_val(data,col,row.time,hour,'h')
+
+    return data
+
 def get_future_h_cols(data,hours=[1,2,3,4,5,6,7],cols=['DA_price','RT_price','load']):
 
     for index,row in data.iterrows():
