@@ -84,9 +84,6 @@ def main():
     test_time_ = test_df.pop("time")
     val_time_ = val_df.pop("time")
 
-    for df in [train_df, test_df, val_df]:
-        df.drop(["date"], inplace=True, axis=1)
-
     column_indices = {col: train_df.columns.get_loc(col) for col in train_df.columns}
 
     train_mean = train_df.mean(numeric_only=True, axis=0)
@@ -105,20 +102,22 @@ def main():
             Given 24 hours of inputs (input_width)
             predict 24 hours into the future
     """
-    PATIENCE = 10
-    MAX_EPOCHS = 100
-
+    PATIENCE = 30
+    MAX_EPOCHS = 200
+    
     NFEATURES = train_df.shape[1]
     OUT_STEPS = 24
-    CONVWIDTH = 16
+    CONVWIDTH = 6
+    BATCHSIZE = 1024
     multi_window = WindowGenerator(input_width=24,
                                    label_width=OUT_STEPS,
                                    shift=OUT_STEPS,
-                                   batch_size=64,
+                                   batch_size=BATCHSIZE,
                                    train_df=train_df,
                                    val_df=val_df,
                                    test_df=test_df)
 
+    print(f"Number of features:{NFEATURES}")
     baseline_model = models.Baseline("Baseline")
     linear_model = models.LinearMultiStep("Linear", OUT_STEPS, NFEATURES)
     dense_model = models.DenseMultistep("Dense", OUT_STEPS, NFEATURES)
@@ -128,9 +127,11 @@ def main():
     ## Now train and test the models
     baseline_model.compile(loss=tf.keras.losses.MeanSquaredError(),
                         metrics=[tf.keras.metrics.RootMeanSquaredError()])
-    
+    print("*"*15,'\n',"Linear Model:")
     history_linear = models.compile_and_fit(linear_model, multi_window, patience=PATIENCE, max_epochs=MAX_EPOCHS)
+    print("*"*15,'\n',"Dense Model:")
     history_dense = models.compile_and_fit(dense_model, multi_window, patience=PATIENCE, max_epochs=MAX_EPOCHS)
+    print("*"*15,'\n',"CNN Model:")
     history_cnn = models.compile_and_fit(cnn_model, multi_window, patience=PATIENCE, max_epochs=MAX_EPOCHS)
 
 
@@ -173,14 +174,14 @@ def main():
         ax.xaxis.set_minor_locator(NullLocator())
         ax.xaxis.set_minor_formatter(NullFormatter())
     axes[-1].set_xlabel('Epochs')
-    fig2.supylabel('Loss Function (MSE)')
+    fig5.supylabel('Loss Function (MSE)')
 
-    width=3
+    width=0.3
     x = np.arange(len(performance))
-    fig, ax = plt.subplots(1, 1)
+    fig6, ax = plt.subplots(1, 1)
     ax.set_title(f"Multi-Step Models")
-    ax.bar(x - 0.17, results['Validation'], width, label="Validation", color='orange')
-    ax.bar(x + 0.17, results['Test'], width, label="Test", color='green')
+    ax.bar(x - 0.2, results['Validation'].values, width, label="Validation", color='orange')
+    ax.bar(x + 0.2, results['Test'].values, width, label="Test", color='green')
     ax.set_xticks(ticks=x, labels=performance.keys(), rotation=90)
     ax.set_ylabel("RMSE (average over all outputs)")
     ax.xaxis.set_minor_locator(NullLocator())

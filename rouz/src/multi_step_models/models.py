@@ -64,7 +64,7 @@ class DenseMultistep(keras.Model):
         ## get the last time step:
         self.layers_.add(keras.layers.Lambda(lambda x: x[:, -1:, :]))
         ## A dense layer with ReLU:
-        self.layers_.add(keras.layers.Dense(64, activation='relu'))
+        self.layers_.add(keras.layers.Dense(256, activation='relu'))
         ## apply a dense layer with this (output_width * nfeature)
         ## many neurons
         self.layers_.add(keras.layers.Dense(output_width*nfeatures,
@@ -84,7 +84,7 @@ class ConvolutionalMultiStep(keras.Model):
         ## take the previous conv_width time steps:
         self.layers_.add(keras.layers.Lambda(lambda x: x[:, -conv_width:, :]))
         ## apply a convolution layer
-        self.layers_.add(keras.layers.Conv1D(64, activation='relu', kernel_size=(conv_width)))
+        self.layers_.add(keras.layers.Conv1D(512, activation='relu', kernel_size=(conv_width)))
         ## apply a linear dense layer for prediction
         self.layers_.add(keras.layers.Dense(output_width*nfeatures,
                           kernel_initializer=tf.initializers.zeros()))
