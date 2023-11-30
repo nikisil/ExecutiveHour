@@ -302,30 +302,67 @@ def read_data_Rouz(ratio_train, ratio_val, print_correlations=False):
     return train_df, val_df, test_df
 
 def read_data_Nic(holiday_calendar):
-    val_df = pd.read_csv("../../../final_datasets/smaller_ordered_seasonal_validation_set.csv")
-    test_df = pd.read_csv("../../../final_datasets/smaller_ordered_test_set.csv")
-    train_df = pd.read_csv("../../../final_datasets/larger_ordered_train_set.csv")
+    loc = '../../../data_processing/final_data/'
+    val_df   = pd.read_csv(loc+"ordered_seasonal_validation_set.csv")
+    test_df  = pd.read_csv(loc+"ordered_test_set.csv")
+    train_df = pd.read_csv(loc+"ordered_train_set.csv")
 
+    selected_features = [
+        'time', 'DA_price', 'RT_price', 'load', 
+        'temp', 
+        'dwpt',
+        'nat_gas_spot_price', 
+        'monthly_avg_NY_natgas_price', 
+        'weekday', 'holiday', 'business_hour', 
+        'avg_RT_price_prev_day', 'avg_actual_load_prev_day',
+
+        'load(h-1)', 'load(h-2)', 
+        'load(h-19)', 'load(h-20)', 
+        'load(h-21)', 'load(h-22)', 
+        'load(h-23)', #'load(h-24)', 
+        'load(h-25)', 'load(h-26)',
+
+        'price(h-1)', 'price(h-2)', 
+        'price(h-19)', 'price(h-20)', 
+        'price(h-21)', 'price(h-22)',
+        'price(h-23)', 
+        'price(h-25)', 
+        'price(h-26)',
+
+       'DA_price(t-1D)', 'DA_price(t-2D)', 
+       'DA_price(t-3D)', 'DA_price(t-4D)', 
+    #    'DA_price(t-5D)', 'DA_price(t-6D)',
+    #    'DA_price(t-7D)',
+
+    #    'RT_price(t-1D)', 'RT_price(t-2D)', 
+    #   'RT_price(t-3D)', 'RT_price(t-4D)', 
+    #    'RT_price(t-5D)', 'RT_price(t-6D)',
+    #    'RT_price(t-7D)', 
+
+       'load(t-1D)', 'load(t-2D)', 
+       'load(t-3D)', 'load(t-4D)', 
+       'load(t-5D)', 'load(t-6D)', 
+
+       'hour_sin', 'hour_cos', 
+       'day_sin', 'day_cos', 
+       'day_of_week_sin', 'day_of_week_cos', 
+       'month_sin', 'month_cos']
+
+        
     for df in [val_df, test_df, train_df]:
         time_ = pd.to_datetime(df['time'])
         day = time_.dt.day
         df.loc[:,"hour_sin"] = sin_transformer(24).fit_transform(df["hour"])
         df.loc[:,"hour_cos"] = cos_transformer(24).fit_transform(df["hour"])
         df.loc[:,"day_sin"]  = sin_transformer(30.44).fit_transform(day)
-        df.loc[:,"day_cos"]  = cos_transformer(20.44).fit_transform(day)
+        df.loc[:,"day_cos"]  = cos_transformer(30.44).fit_transform(day)
         df.loc[:,"day_of_week_sin"]  = sin_transformer(7).fit_transform(df["day_of_week"])
         df.loc[:,"day_of_week_cos"]  = cos_transformer(7).fit_transform(df["day_of_week"])
         df.loc[:,"month_sin"]  = sin_transformer(12).fit_transform(df["month"])
         df.loc[:,"month_cos"]  = cos_transformer(12).fit_transform(df["month"])
-
         df.loc[:,"holiday"] = [int(v in holiday_calendar) for v in df.date]
 
-        features_to_drop = ['minute','hour', 'day_of_week', 'season', 
-                            'Unnamed: 0.2', 'Unnamed: 0.1', 'Unnamed: 0',
-                            'month']
 
-        df.drop(features_to_drop, axis=1, inplace=True)
-
-    return train_df, val_df, test_df
+    return train_df[selected_features], val_df[selected_features], test_df[selected_features]
 
 
