@@ -85,9 +85,6 @@ def process_data(train_df, val_df, test_df):
     _ = test_df.pop("time")
     _ = val_df.pop("time")
 
-    for df in [train_df, test_df, val_df]:
-        df.drop(["date"], inplace=True, axis=1)
-
     column_indices = {col: train_df.columns.get_loc(col) for col in train_df.columns}
 
     train_mean = train_df.mean(numeric_only=True, axis=0)
