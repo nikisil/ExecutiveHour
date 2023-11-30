@@ -100,7 +100,7 @@ def TrainLSTM(train_data, test_data, validate_data, features, layers=[20], save=
             model.add(LSTM(layer, return_sequences=True))
     
     model.add(Dense(1))
-    model.compile(loss='mae',optimizer='adam')
+    model.compile(loss='mae',optimizer=tf.keras.optimizers.legacy.Adam())
 
     history = model.fit(train_X,train_Y, epochs=num_epochs, 
                         batch_size=b_size, validation_data=(test_X,test_Y), 
@@ -213,7 +213,7 @@ def TrainLSTM24(train_data, test_data, validate_data, features, neurons=500, den
     model.add(TimeDistributed(Dense(1)))
     # model.add(Dense(dense, activation='relu'))
     # model.add(Dense(train_Y.shape[1]))
-    opt = Adam(learning_rate=0.001)
+    opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.001)
     model.compile(loss='mse', optimizer=opt)
 
     model.fit(train_X, train_Y, epochs=num_epochs, batch_size=b_size, verbose=2, callbacks=[callback])
@@ -364,9 +364,9 @@ def get_features():
 
 def main():
 
-    ordered_train = pd.read_csv('../data_processing/final_data/ordered_train_set.csv',parse_dates=['time','date']).dropna()
-    test_dataset  = pd.read_csv('../data_processing/final_data/ordered_test_set.csv',parse_dates=['time','date']).dropna()
-    val_dataset   = pd.read_csv('../data_processing/final_data/ordered_seasonal_validation_set.csv',parse_dates=['time','date']).dropna()
+    ordered_train = pd.read_csv('../../data_processing/final_data/ordered_train_set.csv',parse_dates=['time','date']).dropna()
+    test_dataset  = pd.read_csv('../../data_processing/final_data/ordered_test_set.csv',parse_dates=['time','date']).dropna()
+    val_dataset   = pd.read_csv('../../data_processing/final_data/ordered_seasonal_validation_set.csv',parse_dates=['time','date']).dropna()
     # features = ['DA_price',
     #    'RT_price', 'load', 'temp', 'dwpt', 'nat_gas_spot_price',
     #    'monthly_avg_NY_natgas_price',
@@ -452,7 +452,7 @@ def main():
        'DA_price(t+22h)', 'DA_price(t+23h)', 'DA_price(t+24h)']
                     
     test = TrainLSTM24(ordered_train,test_dataset,val_dataset,features,num_epochs=200,neurons=300,dense=200,b_size=72,save=sys.argv[1])
-    
+    return test
 
 if __name__ == '__main__':
     main()

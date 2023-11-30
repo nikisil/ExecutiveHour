@@ -95,7 +95,7 @@ class DenseMultistep(keras.Model):
         ## get the last time step:
         self.layers_.add(keras.layers.Lambda(lambda x: x[:, -1:, :]))
         ## A dense layer with ReLU:
-        self.layers_.add(keras.layers.Dense(512, activation="relu"))
+        self.layers_.add(keras.layers.Dense(256, activation="relu"))
         ## apply a dense layer with this (output_width * nfeature)
         ## many neurons
         self.layers_.add(
