@@ -4,31 +4,24 @@ import tensorflow as tf
 from tensorflow import keras
 
 
-def get_rmse(model, dataset, mean, std, index=0):
+def get_rmse(model, dataset, std, index=0):
     rms_err, num = 0, 0
-
+    
     for x, y in dataset:
-        ## make prediction
-        y_pred = model.predict(x, verbose=0)
+
+        ## make prediction 
+        y_pred = model.predict_on_batch(x)
 
         ## get the correct column
         y_pred = y_pred[:, :, index]
         y_true = y[:, :, index]
-        ## rescale
-        y_pred = y_pred * std + mean
-        y_true = y_true * std + mean
 
-        ## reshape both to be a 1D array
-        y_true = tf.reshape(y_true, [-1]).numpy()
-        y_pred = tf.reshape(y_pred, [-1])
-        # print(f"y_pred: {y_pred.shape}")
-        # print(f"y_true: {y_true.shape}")
-        # exit(20)
-        ## compute squared error error
-        rms_err += sum((y_true - y_pred) ** 2)
-        num += len(y_true)
-    ## return the final root-mean-squared error
-    return np.sqrt(rms_err / num)
+        batch_err = keras.metrics.mean_absolute_error(y_true, y_pred)
+        rms_err += sum(batch_err)
+        num += batch_err.shape[0] ## size of the batch: number of values.
+    ## scale by the std of the quantity so the units are correct
+    rms_err = std * np.sqrt(rms_err/num)
+    return rms_err
 
 
 def compile_and_fit(
@@ -36,7 +29,7 @@ def compile_and_fit(
     window,
     patience=2,
     max_epochs=20,
-    learning_rate=5e-3,
+    learning_rate=5e-4,
     save=False,
     fname="./tmp.keras",
 ):
@@ -102,7 +95,7 @@ class DenseMultistep(keras.Model):
         ## get the last time step:
         self.layers_.add(keras.layers.Lambda(lambda x: x[:, -1:, :]))
         ## A dense layer with ReLU:
-        self.layers_.add(keras.layers.Dense(256, activation="relu"))
+        self.layers_.add(keras.layers.Dense(512, activation="relu"))
         ## apply a dense layer with this (output_width * nfeature)
         ## many neurons
         self.layers_.add(

@@ -34,25 +34,30 @@ def read_data(loc):
         'load(h-1)', 'load(h-2)', 
         'load(h-19)', 'load(h-20)', 
         'load(h-21)', 'load(h-22)', 
-        'load(h-23)', 'load(h-24)', 
-    #    'load(h-25)', 'load(h-26)',
-       'price(h-1)', 'price(h-2)', 
-       'price(h-19)', 'price(h-20)', 
-       'price(h-21)', 'price(h-22)',
-       'price(h-23)', 'price(h-25)', 
-    #    'price(h-26)',
+        'load(h-23)', #'load(h-24)', 
+        'load(h-25)', 'load(h-26)',
+
+        'price(h-1)', 'price(h-2)', 
+        'price(h-19)', 'price(h-20)', 
+        'price(h-21)', 'price(h-22)',
+        'price(h-23)', 
+        'price(h-25)', 
+        'price(h-26)',
 
        'DA_price(t-1D)', 'DA_price(t-2D)', 
-       'DA_price(t-3D)', #'DA_price(t-4D)', 
+       'DA_price(t-3D)', 'DA_price(t-4D)', 
     #    'DA_price(t-5D)', 'DA_price(t-6D)',
     #    'DA_price(t-7D)',
+
     #    'RT_price(t-1D)', 'RT_price(t-2D)', 
-    #    'RT_price(t-3D)', 'RT_price(t-4D)', 
+    #   'RT_price(t-3D)', 'RT_price(t-4D)', 
     #    'RT_price(t-5D)', 'RT_price(t-6D)',
     #    'RT_price(t-7D)', 
+
        'load(t-1D)', 'load(t-2D)', 
-       'load(t-3D)', #'load(t-4D)', 
-    #    'load(t-5D)', 'load(t-6D)', 
+       'load(t-3D)', 'load(t-4D)', 
+       'load(t-5D)', 'load(t-6D)', 
+
        'hour_sin', 'hour_cos', 
        'day_sin', 'day_cos', 
        'day_of_week_sin', 'day_of_week_cos', 
@@ -71,7 +76,6 @@ def read_data(loc):
         df.loc[:,"month_sin"]  = sin_transformer(12).fit_transform(df["month"])
         df.loc[:,"month_cos"]  = cos_transformer(12).fit_transform(df["month"])
         df.loc[:,"holiday"] = [int(v in holidays) for v in df.date]
-
 
     return train_df[selected_features], val_df[selected_features], test_df[selected_features]
 
