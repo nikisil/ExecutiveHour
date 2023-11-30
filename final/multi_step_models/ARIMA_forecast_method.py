@@ -117,5 +117,6 @@ class ArimaModel():
         ax2.set_xlabel('Time')
         ax1.legend(fontsize=8, loc='best')
         ax2.legend(fontsize=8, loc='best')
+        return fig, (ax1, ax2)
         
 
