@@ -6,7 +6,7 @@ Our chosen market was determined to be the New York City wholesale electricity m
 
 The energy price data (both real-time and day-ahead) as well as electricity load data was sourced from the [NRG](https://www.nrg.com/resources/energy-tools/tracking-the-market.html). The NRG corporation provides free access to this data going back three years. Our final data set then contains load and price data from 27th of October 2020 to the 1st of October 2023.  
 
-This was augmented, based on a preliminary analysis of the time series, by price data at a certain number of previous time steps (in hours). The feature set was further expanded to include categorical temporal information (day of the week, weekday vs weekend etc), as well as monthly average natural gas prices in the country. For more information on the data preprocessing and merging, see the [data processing notebook](./data_processing/data_processing.ipynb). 
+This was augmented, based on a preliminary analysis of the time series, by price data at a certain number of previous time steps (in hours). The feature set was further expanded to include categorical temporal information (day of the week, weekday vs weekend etc), as well as monthly average natural gas prices in the country. For more information on the data preprocessing and merging, see the [data processing notebook](./data_processing/data_processing.ipynb) as well as the Quick Walkthrough provided below. 
 
 ## Modelling  
 
@@ -23,6 +23,38 @@ Motivated by the preprocessing stage, the baseline was chosen to be a simple mod
 |         ARIMA |       0.00 | 20.65 |
 
 The models are presented in this [notebook](./final/multi_step_models/ExecutiveHour.ipynb).
+
+## Setup
+
+If you would like to reproduce (or build upon) the results and models developed in this analysis, you will need the following python packages:
+
+- jupyter
+- pandas
+- numpy
+- matplotlib
+- tensorflow
+- keras
+- holidays
+- xgboost
+- statsmodels
+- sklearn
+- meteostat
+
+along with all default packages included in Python 3.10. Using an older version of python may lead to compatibility issues.
+
+## Quick Walkthrough
+
+### Data-Processing
+
+Our work is divided into annotated notebooks. To start, one could want to regenerate (or add to) our data. To do so, go to the [data_processing](./data_processing/data_processing.ipynb) Jupyter Notebook. This notebook makes use of functions and classes that were developed specifically for the problem at hand and contained in [helpers](./data_processing/helpers.py), [preprocess](./data_processing/preprocess.py), [train_test_validate_split](./data_processing/train_test_validate_split.py) & [weather](./data_processing/weather.py). The [data processing notebook](./data_processing/data_processing.ipynb) relies on [raw energy data](./data_processing/raw_data/dat_set_3/) (pulled from [NRG](https://www.nrg.com/resources/energy-tools/tracking-the-market.html)), as well as [average natural gas prices](./data_processing/raw_data/nat_gas_prices.csv) (pulled from [EIA](https://www.eia.gov/dnav/ng/hist/n3035ny3m.htm)). It pulls weather data using the [meteostat](https://dev.meteostat.net/python/). All of these data sources are then merged into a single dataframe in the [data processing](./data_processing/data_processing.ipynb), which creates train, validation and test sets, which it saves in [final_data](./data_processing/final_data/).
+
+### Training and Running Models
+
+Once all of the data is cleaned and generated, we move to the [final](./final/) notebook. Here, two model types are provided: Simple [single step models](./final/single_step_models/), which were trained to predict Day-Ahead prices one hour into the future given varying amounts of information, and [multi step models](./final/multi_step_models/), which were trained to predict the next 24 hours of Day-Ahead prices all at once. Both of these directories contain notebooks ([single](./final/single_step_models/ExecutiveHour.ipynb) and [multi](./final/multi_step_models/ExecutiveHour.ipynb)) which can be used to train, test and modify models as need be. All of the models are developed in python scripts provided in the same directories as the corresponding Jupyter notebooks.
+
+### Other directories
+
+[Final datasets](./final_datasets/) contains final train, validation and test datasets used in training. These are recorded in this specific directory so that any re-run of the [data processing](./data_processing/data_processing.ipynb) notebook will not affect these sets (and therefore preserve their state for posterity). The [miscellaneous](./misc) directory contains various notebooks, scripts (which may or may not be found in the [final](./final/) and [data processing](./data_processing/) directories) and exogenous datasets which were used at some point or another in our exploration. Note that code in the [misc](./misc/) directory may not be as well documented as code found elsewhere in the git, so any questions regarding files contained within said directory can be directed to team members.
 
 ## Conclusion  
 
