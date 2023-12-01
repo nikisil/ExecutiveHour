@@ -6,7 +6,7 @@ Our chosen market was determined to be the New York City wholesale electricity m
 
 The energy price data (both real-time and day-ahead) as well as electricity load data was sourced from the [NRG](https://www.nrg.com/resources/energy-tools/tracking-the-market.html). The NRG corporation provides free access to this data going back three years. Our final data set then contains load and price data from 27th of October 2020 to the 1st of October 2023.  
 
-This was augmented, based on a preliminary analysis of the time series, by price data at a certain number of previous time steps (in hours). The feature set was further expanded to include categorical temporal information (day of the week, weekday vs weekend etc), as well as monthly average natural gas prices in the country. For more information on the data preprocessing and merging, see notebook in link.
+This was augmented, based on a preliminary analysis of the time series, by price data at a certain number of previous time steps (in hours). The feature set was further expanded to include categorical temporal information (day of the week, weekday vs weekend etc), as well as monthly average natural gas prices in the country. For more information on the data preprocessing and merging, see the [data processing notebook](./data_processing/data_processing.ipynb). 
 
 ## Modelling  
 
