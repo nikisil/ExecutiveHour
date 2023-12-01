@@ -1,4 +1,7 @@
 # ExecutiveHour: Energy-price forecasting
+
+by Irem Altimer, Nicolas Fortier, Souparna Purohit & Rouzbeh Modarresi Yazdi
+
 Electricity and energy markets are an integral part of the electrical grid, allowing for the matching of the supply and demand of electricity via market mechanisms. Accurate forecasting of electricity demand and price is crucial given that generated power needs to be consumed immediately and it cannot be stored. In this work, we focus on the day-ahead markets for electricity, where participants purchase or supply electricity to be delivered the following day. This mechanism accounts for $95$\% of overall transactions (NRG Energy, Inc.) and avoids the volatility of the real-time price.  
 
 ## Target market and data step
