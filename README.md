@@ -50,7 +50,7 @@ Our work is divided into annotated notebooks. To start, one could want to regene
 
 ### Training and Running Models
 
-Once all of the data is cleaned and generated, we move to the [final](./final/) notebook. Here, two model types are provided: Simple [single step models](./final/single_step_models/), which were trained to predict Day-Ahead prices one hour into the future given varying amounts of information, and [multi step models](./final/multi_step_models/), which were trained to predict the next 24 hours of Day-Ahead prices all at once. Both of these directories contain notebooks ([single](./final/single_step_models/ExecutiveHour.ipynb) and [multi](./final/multi_step_models/ExecutiveHour.ipynb)) which can be used to train, test and modify models as need be. All of the models are developed in python scripts provided in the same directories as the corresponding Jupyter notebooks.
+Once all of the data is cleaned and generated, we move to the [final](./final/) directory. Here, two model types are provided: Simple [single step models](./final/single_step_models/), which were trained to predict Day-Ahead prices one hour into the future given varying amounts of information, and [multi step models](./final/multi_step_models/), which were trained to predict the next 24 hours of Day-Ahead prices all at once. Both of these sub-directories contain notebooks ([single](./final/single_step_models/ExecutiveHour.ipynb) and [multi](./final/multi_step_models/ExecutiveHour.ipynb)) which can be used to train, test and modify models as need be. All of the models are developed in python scripts provided in the same directories as their corresponding Jupyter notebooks.
 
 ### Other directories
 
